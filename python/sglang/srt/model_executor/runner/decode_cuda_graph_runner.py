@@ -444,8 +444,7 @@ class DecodeCudaGraphRunner(BaseCudaGraphRunner):
         self.buffers.share_buffers()
         # FB-shared slot registry adopting DecodeInputBuffers storage (same
         # physical tensors, stable data_ptr for capture vs replay). Provides
-        # the unified fill_from / slot access surface, replacing
-        # populate_from_forward_batch on capture/replay paths.
+        # the unified fill_from / slot access surface for capture/replay.
         self.buffer_registry: CudaGraphBufferRegistry = build_decode_registry(
             device=self.device,
             max_bs=self.max_bs,
@@ -915,8 +914,7 @@ class DecodeCudaGraphRunner(BaseCudaGraphRunner):
             else None
         )
 
-        # Adjust for attention TP if needed (matching replay path in
-        # populate_from_forward_batch).
+        # Adjust for attention TP if needed, matching the replay registry.
         buffers.num_token_non_padded[...] = num_tokens
         if (
             enable_num_token_non_padded()
